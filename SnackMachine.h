@@ -1,167 +1,71 @@
-// Jorge Avila 1001543128 SnackMachine.h
+// Serge Zaatar Antor 1001623346
+
+#ifndef SNACK_MACHINE_H
+#define SNACK_MACHINE_H
+
 #include <iostream>
 #include <string>
+#include "SnackLib.h"
 
-enum STATUS
+enum Status
 {
-  OK_ChangeGiven,
-  OK_NoChange,
-  BAD_Insuff_Fund,
-  BAD_Insuff_Change,
-  BAD_unknown,
-  BAD_InventoryExceed,
-  GOOD_InventoryLevel,
-  Restock_zero,
-  Invalid_restock,
-  RAN_OUT
+    GOOD_CHANGE,
+    GOOD_EXACT,
+    GOOD_INVENTORY,
+    BAD_NOFUNDS,
+    BAD_NOCHANGE ,
+    BAD_UNKNOWN, 
+    BAD_INVENTORY,
+    BAD_RANOUT,
+    ZERO,
+    INVALID
 };
 
-STATUS status{};
+Status status {};
 
 class SnackMachine
 {
-  /* Right here is my constructor */
+    friend std::ostream& operator<<(std::ostream& output, const SnackMachine &MySnackMachine);
+    friend std::string CreateSnackOutputLine(const SnackMachine &MySnackMachine);
+    private:
+        std::string machineName;
+        int changeLevel;
+        int maxChangeCapacity = 5000;
+        int SnackPrice;
+        int inventoryLevel;
+        int maxInventoryCapacity = 100;
+    public:
+        SnackMachine (std::string name = "New Machine", int cost = 50, int change = 500, int inventory = 100):
+            machineName{name},
+            SnackPrice{cost},
+            changeLevel{change},
+            inventoryLevel{inventory};
 
-public:
-  SnackMachine(std::string name, int cost, int change, int inventory) :
+        std::string getMachineName();
 
-      machineName{name},
-      SnackPrice{cost},
-      changeLevel{change},
-      inventoryLevel{inventory}
+        bool buyASnack(int &payment, std::string &change, int &status);
 
-  {
-  }
-  std::string getMachineName()
-  {
-    return machineName;
-  }
-  bool buyASnack(int &payment, std::string &change, int &status)
-  {
+        int getInventoryLevel();
 
-    int change_tostring = payment - SnackPrice;
-    // changeLevel = changeLevel + change_tostring;
-    // change = to_string(change_tostring);
-    if (change_tostring > /* maxChangeCapacity */ changeLevel)
-    {
+        int getMaxInventoryCapacity();
 
-      status = BAD_Insuff_Change;
-      return false;
-    }
-    else if (payment > SnackPrice)
-    {
+        bool incrementInventory(int amountToAdd);
 
-      /* If payment is above then SnackPrice then do the arthimetic */
-      //int change_tostring = payment - SnackPrice;
-      changeLevel = changeLevel + SnackPrice;
-      change = displayMoney(change_tostring);
-      inventoryLevel = inventoryLevel - 1;
-      //cout << change << endl; // testing out if it works and it does give correct change
-      // ok but change needs to be given
-      status = OK_ChangeGiven;
-      return true;
-    }
-    else if (payment < SnackPrice)
-    {
+        std::string getChangeLevel();
+        
+        bool incrementChangeLevel(int amountToAdd);
 
-      // not enough money was given
-      status = BAD_Insuff_Fund;
-      return false;
-    }
-    else if (payment == SnackPrice)
-    {
-      /* If payment is above then SnackPrice then do the arthimetic */
+        std::string getMaxChangeCapacity();
 
-      int change_tostring = payment - SnackPrice;
-      changeLevel = changeLevel + SnackPrice;
-      change = to_string(change_tostring);
-      inventoryLevel = inventoryLevel - 1;
-      // good, but no change is given
-      status = OK_NoChange;
-      return true;
-    }
-    else if (inventoryLevel == 0)
-    {
-      status = RAN_OUT;
-      return false;
-    }
-  }
-  int getInventoryLevel()
-  {
-    // whatever current level that may be
+        std::string getSnackPrice();
 
-    return inventoryLevel;
-  }
-  int getMaxInventoryCapacity()
-  {
-    return maxChangeCapacity;
-  }
-  bool incrementInventory(int amountToAdd)
-  {
-    if ((amountToAdd + inventoryLevel) > maxInventoryCapacity)
-    {
-      status = BAD_InventoryExceed;
-      // It was way to big and need to return;
-      return false;
-    }
-    else if ((amountToAdd + inventoryLevel) <= maxInventoryCapacity)
-    {
-      inventoryLevel = amountToAdd + inventoryLevel;
-      status = GOOD_InventoryLevel;
-      return true;
-    }
-    else if (amountToAdd < 0)
-    {
-      // they entered zero for a restock
-      status = Restock_zero;
-      return false;
-    }
-    else if (amountToAdd < -1)
-    {
-      // entered a negative number
-      status = Invalid_restock;
-      return false;
-    }
-  }
+        std::string displayMoney(int amount);
 
-  std::string getMaxChangeCapacity()
-  {
-    return (displayMoney(maxChangeCapacity));
-  }
-  std::string getSnackPrice()
-  {
-    return displayMoney(SnackPrice);
-  }
-  std::string displayMoney(int amount)
-  {
-    std::string dollars{std::to_string(amount / 100)};
-    std::string cents{std::to_string(std::abs(amount % 100))};
-    return "$" + dollars + "." + (cents.size() == 1 ? "0" : "") + cents;
-  }
-  bool IncrementChangeLevel(int amountToAdd)
-  {
-    if ((changeLevel + amountToAdd) <= maxChangeCapacity)
-    {
-      changeLevel = changeLevel + amountToAdd;
-      return true;
-    }
-    else if ((changeLevel + amountToAdd) > maxChangeCapacity)
-    {
+        void setMachineName(std::string newMachineName);
 
-      return false;
-    }
-  }
-  std::string getChangeLevel()
-  {
+        std::string getMachineName();
 
-    return (displayMoney(changeLevel));
-  }
-
-private:
-  std::string machineName;
-  int changeLevel;
-  int maxChangeCapacity = 5000;
-  int SnackPrice;
-  int inventoryLevel;
-  int maxInventoryCapacity = 100;
+        void setSnackPrice(std::string newSnackPrice);
 };
+
+#endif
